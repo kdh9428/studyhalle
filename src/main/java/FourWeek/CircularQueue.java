@@ -1,8 +1,5 @@
 package FourWeek;
 
-import java.util.EmptyStackException;
-import java.util.NoSuchElementException;
-
 public class CircularQueue {
 
     private int[] queueArray;
