@@ -9,13 +9,12 @@ public class StackDataStructure {
     private int elementCount;
 
     public StackDataStructure() {
-        elementData = new int[5];
-        this.elementCount = 0;
+        this(5);
     }
 
     public StackDataStructure(int size) {
         elementData = new int[size];
-        this.elementCount = 0;
+        this.elementCount = -1;
     }
 
     public int push(int item) {
@@ -23,7 +22,7 @@ public class StackDataStructure {
         int length = elementData.length;
 
         if (length == elementCount + 1) {
-            elementData = Arrays.copyOf(elementData,length * 2);
+            elementData = Arrays.copyOf(elementData, length * 2);
         }
 
         addElement(item);
@@ -31,21 +30,21 @@ public class StackDataStructure {
     }
 
     private void addElement(int item) {
-        elementData[elementCount] = item;
         elementCount++;
+        elementData[elementCount] = item;
     }
 
     public int peek() {
-        return elementData[elementCount - 1];
+        return elementData[elementCount];
     }
 
     public int pop() {
 
-        if (elementCount <= 0)
+        if (elementCount <=-1)
             throw new EmptyStackException();
 
         int data = peek();
-        elementData[elementCount - 1] = 0;
+        elementData[elementCount] = 0;
         elementCount--;
 
         return data;
@@ -63,8 +62,7 @@ public class StackDataStructure {
         return index;
     }
 
-    public boolean empty(){
-        return elementCount == 0;
+    public boolean empty() {
+        return elementCount == -1;
     }
-
 }

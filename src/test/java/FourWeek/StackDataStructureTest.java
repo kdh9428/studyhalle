@@ -45,8 +45,8 @@ class StackDataStructureTest {
         stack.push(30);
         stack.push(40);
 
-        assertEquals(1, stack.search(40));
-        assertEquals(4, stack.search(10));
+        assertEquals(0, stack.search(40));
+        assertEquals(3, stack.search(10));
     }
 
     @Test
