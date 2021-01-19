@@ -26,6 +26,15 @@ public class LinkedListDataStructure {
         }
     }
 
+    private Node node(int index) {
+        Node x = head;
+        for (int i = 0; i < index; i++) {
+            x = x.next;
+        }
+        return x;
+    }
+
+
     public void addFirst(Object element) {
         Node newNode = new Node(element);
         newNode.next = head;
@@ -49,14 +58,6 @@ public class LinkedListDataStructure {
         }
     }
 
-    private Node node(int index) {
-        Node x = head;
-        for (int i = 0; i < index; i++) {
-            x = x.next;
-        }
-        return x;
-    }
-
     public void add(int index, Object element) {
         checkPositionIndex(index);
         if (index == 0) {
@@ -73,7 +74,6 @@ public class LinkedListDataStructure {
     }
 
     public void add(Object element) {
-        Node newNode = new Node(element);
 
         if (size == 0) {
             addFirst(element);
@@ -128,9 +128,8 @@ public class LinkedListDataStructure {
             Node deleteNode = previousNode.next;
             previousNode.next = deleteNode.next;
             deleteNode.next = null;
-            deleteNode.data = null;
             size--;
-            return deleteNode;
+            return deleteNode.data;
         }
     }
 
@@ -167,7 +166,7 @@ public class LinkedListDataStructure {
     }
 
     private boolean isElementIndex(int index) {
-        return index >= 0 && index < size;
+        return index >= 0 && index <= size;
     }
 
     private void checkPositionIndex(int index) {
@@ -179,7 +178,7 @@ public class LinkedListDataStructure {
         return "범위를 벗어났습니다. Index: " + index + ", Size:" + size;
     }
 
-    public boolean contains(Object element){
+    public boolean contains(Object element) {
         return indexOf(element) >= 0;
     }
 
