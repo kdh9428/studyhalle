@@ -1,15 +1,33 @@
 package FourWeek;
 
+import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledIf;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.AggregateWith;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregationException;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
+import org.junit.jupiter.params.converter.ArgumentConversionException;
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.jupiter.params.converter.SimpleArgumentConverter;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.concurrent.CountDownLatch;
 
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.condition.OS.*;
 
 //@IndicativeSentencesGeneration(separator = " -> ", generator = DisplayNameGenerator.ReplaceUnderscores.class)
 //@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -95,7 +113,6 @@ public class TestCode {
     @ParameterizedTest
     @NullSource
     void tesTAssertThat(String a) {
-//        assertEquals("a", "B", "test context");
         assertTrue(a == null);
 
     }
@@ -151,7 +168,7 @@ public class TestCode {
 
     @Test
     @DisplayName("테스트가 10밀리초 이상일 경우 실패")
-    void testTimeOut(){
+    void testTimeOut() {
 
 
         assertTimeout(ofMillis(10), () -> {
@@ -168,6 +185,75 @@ public class TestCode {
             new CountDownLatch(1).await();
         });
     }
+
+
+    @Test
+    @EnabledOnOs(MAC)
+    void onlyOnMacOs() {
+        // ...
+    }
+
+    @TestOnMac
+    void testOnMac() {
+        // ...
+    }
+
+    @Test
+    @EnabledOnOs({LINUX, MAC})
+    void onLinuxOrMac() {
+        // ...
+    }
+
+    @Test
+    @DisabledOnOs(WINDOWS)
+    void notOnWindows() {
+        // ...
+    }
+
+    @Test
+    @TestOnWin
+    void OnWindows() {
+        // ...
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Test
+    @EnabledOnOs(MAC)
+    @interface TestOnMac {
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Test
+    @EnabledOnOs(WINDOWS)
+    @interface TestOnWin {
+    }
+
+
+    @ParameterizedTest(name = "{index} {displayName} message = {0}")
+    @ValueSource(ints = {10, 20, 30})
+    void parameterizedTest(@ConvertWith(PersonConverter.class) Person person) {
+        System.out.println(person.getAge());
+    }
+
+    @ParameterizedTest(name = "[{index}] 나이 : {0}, 이름 : {1}")
+    @CsvSource({"10, Aaron", "20, 'Aaliyah Smith'"})
+    void cvsSourceTest(@AggregateWith(PersonAggregator.class) Person person) {
+        System.out.println(person);
+    }
+
+    static class PersonAggregator implements ArgumentsAggregator {
+
+        @Override
+        public Object aggregateArguments(ArgumentsAccessor argumentsAccessor, ParameterContext parameterContext) throws ArgumentsAggregationException {
+//            assertEquals(Person.class, argumentsAccessor, "Person 객체만 가능합니다.");
+            Person person = new Person();
+            person.setAge(argumentsAccessor.getInteger(0));
+            person.setName(argumentsAccessor.getString(1));
+            return person;
+        }
+    }
 }
 
 class Person {
@@ -178,6 +264,14 @@ class Person {
     public void setAge(int age) {
         if (age < 0 || age > 150) throw new IllegalArgumentException("잘못된 나이 입니다.");
         this.age = age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getAge() {
@@ -192,5 +286,13 @@ class Person {
     public String getLastName() {
         String second = name.substring(name.indexOf(" ") + 1);
         return second;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "age=" + age +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
