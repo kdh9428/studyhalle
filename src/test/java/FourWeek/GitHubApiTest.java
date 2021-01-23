@@ -11,30 +11,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GitHubApiTest {
 
-    GitHubApi githubApi;
+    public static GitHubApi githubApi;
 
-    @BeforeEach
+    @BeforeAll
     @DisplayName("GitHub 연결")
-    public void githubConnectionTest() {
+    static void githubConnectionTest() {
         githubApi = new GitHubApi();
 
         File file = new File(".\\token.txt");
 
-        StringBuffer buffer = new StringBuffer();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            List<String> list = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
-                buffer.append(line);
+                list.add(line);
             }
+            githubApi.connect(list.get(0), list.get(1));
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        try {
-//            githubApi.githubConnect(buffer.toString(), "whiteship/live-study");
-            githubApi.connect(buffer.toString(), "kdh9428/AgileJava");
-        } catch (IOException e) {
-            fail();
         }
     }
 
@@ -67,6 +61,7 @@ class GitHubApiTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("참여자 데이터 보여주기")
     public void testCode() throws IOException {
         githubApi.show();

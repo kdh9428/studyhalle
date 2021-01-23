@@ -2,6 +2,9 @@ package FourWeek;
 
 import org.kohsuke.github.*;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,9 +34,9 @@ public class GitHubApi {
     public Map<String, Set<String>> getParticipantListByIssue() throws IOException {
         List<GHIssue> issueComments = issues();
         Map<String, Set<String>> commentMap = new HashMap<>();
-        for (GHIssue issue : issueComments){
+        for (GHIssue issue : issueComments) {
             Set<String> login = new HashSet<>();
-            for (GHIssueComment comment :issue.getComments()){
+            for (GHIssueComment comment : issue.getComments()) {
                 login.add(comment.getUser().getLogin());
             }
             commentMap.put(issue.getTitle(), login);
@@ -46,8 +49,8 @@ public class GitHubApi {
         Set<String> keySet = list.keySet();
 
         Set<String> deduplication = new HashSet<>();
-        for (String key : keySet){
-            for (String id : list.get(key)){
+        for (String key : keySet) {
+            for (String id : list.get(key)) {
                 deduplication.add(id);
             }
         }
@@ -59,10 +62,10 @@ public class GitHubApi {
         List<String> issueList = setMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
         Map<String, Double> data = new HashMap<>();
-        for (String list : getListOfAllParticipants()){
+        for (String list : getListOfAllParticipants()) {
             double count = 0;
-            for (String name : issueList){
-                if (list.equals(name)){
+            for (String name : issueList) {
+                if (list.equals(name)) {
                     ++count;
                 }
             }
@@ -73,6 +76,25 @@ public class GitHubApi {
 
     public void show() throws IOException {
         Map<String, Double> participantData = getParticipantData();
-        participantData.keySet().stream().forEach(key -> System.out.println("아이디 : " + key + ", 참석률 : " + String.format("%.2f",(participantData.get(key) / (double) period) * 100)));
+        participantData.keySet().stream().forEach(key -> System.out.println("아이디 : " + key + ", 참석률 : " + String.format("%.2f", (participantData.get(key) / (double) period) * 100)));
+    }
+
+    public static void main(String[] args) {
+        GitHubApi gitHubApi = new GitHubApi();
+
+        File file = new File(".\\token.txt");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            List<String> list = new ArrayList<>();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                list.add(line);
+            }
+            gitHubApi.connect(list.get(0), list.get(1));
+            gitHubApi.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
